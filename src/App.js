@@ -13,7 +13,7 @@ import api from "./services/api";
 
 export default function App() {
 
-  const [repositories, setRepositories] = useState([]);
+  const [repositories, setRepositories] = useState({});
 
   useEffect(() => {
     api.get('/repositories').then(response => {
@@ -23,7 +23,12 @@ export default function App() {
   },[]);
 
   async function handleLikeRepository(id) {
-    // Implement "Like Repository" functionality
+    const response = await api.post(`/repositories/${id}/like`);
+    const updatedRepo = response.data;
+    const repoId = repositories.findIndex(repository => repository.id === updatedRepo.id);
+    const newRepositories = [...repositories];
+    newRepositories[repoId] = updatedRepo;
+    setRepositories(newRepositories);
   }
 
   return (
@@ -50,7 +55,7 @@ export default function App() {
                     style={styles.likeText}
                     testID={`repository-likes-${item.id}`}
                   >
-                    {item.likes} like{item.likes > 1 ? 's' : ''}
+                    {item.likes} curtida{item.likes !== 1  ? 's' : ''}
                   </Text>
                 </View>
                 <TouchableOpacity
